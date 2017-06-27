@@ -50,6 +50,16 @@ func SendToTarget(m Messagable, sessionID SessionID) error {
 	return session.queueForSend(msg)
 }
 
+// SendRawToTarget sends bytes without conversion
+func SendRawToTarget(msgBytes []byte, sessionID SessionID) error {
+	session, ok := lookupSession(sessionID)
+	if !ok {
+		return errUnknownSession
+	}
+
+	return session.queueRawForSend(msgBytes)
+}
+
 func registerSession(s *session) error {
 	sessionsLock.Lock()
 	defer sessionsLock.Unlock()

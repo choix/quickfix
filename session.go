@@ -216,6 +216,20 @@ func (s *session) queueForSend(msg *Message) error {
 	return nil
 }
 
+func (s *sessoin) queueRawForSend(msgBytes []byte) error {
+	s.sendMutex.Lock()
+	defer s.sendMutex.Unlock()
+
+	s.toSend = append(s.toSend, msgBytes)
+
+	select {
+	case s.messageEvent <- true:
+	default:
+	}
+
+	return nil
+}
+
 //send will validate, persist, queue the message. If the session is logged on, send all messages in the queue
 func (s *session) send(msg *Message) error {
 	return s.sendInReplyTo(msg, nil)
